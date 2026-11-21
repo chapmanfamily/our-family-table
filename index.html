@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; object-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Our Family Table</title>
+<link rel="stylesheet" href="style.css">
+<script defer src="model.js"></script>
+<script defer src="app.js"></script>
+</head>
+<body>
+<header class="masthead"><div class="wrap bar"><a class="brand" href="./">Our Family Table</a><div class="actions"><button id="import">Import from Files</button><button id="export" class="primary">Save &amp; Export</button></div></div></header>
+<main class="wrap">
+<input id="file" type="file" accept=".json,application/json" hidden>
+<p id="status" role="status"></p>
+<p id="notice" role="status"></p>
+<div class="layout">
+<aside id="browse" aria-labelledby="recipes-heading">
+<div class="bar"><h2 id="recipes-heading">Recipes</h2><button id="add">Add Recipe</button></div>
+<label>Search recipes<input id="search" type="search" placeholder="Name, ingredient, category or direction"></label>
+<label for="category">Category</label><select id="category"></select>
+<p id="count" aria-live="polite"></p>
+<ul id="recipes"></ul>
+</aside>
+<section id="detail" tabindex="-1"></section>
+</div>
+<details id="archive"><summary>Dropbox, backups &amp; printing</summary>
+<div class="actions"><button id="complete">Export Complete Cookbook</button><button id="print-all">Print Cookbook / Save PDF</button></div>
+<ol>
+<li>In Dropbox, find the latest shared cookbook. On iPhone or iPad, make it available in Files by enabling Dropbox under Browse → More → Edit, or use Dropbox’s export menu to save a copy to Files.</li>
+<li>Select Import from Files and choose the cookbook JSON. Open a recipe, edit it, then select Save Recipe.</li>
+<li>Select Save &amp; Export. Locate the downloaded JSON in your browser’s downloads or the Files app. Move or upload it to the shared Dropbox folder. Wait for Dropbox to finish uploading.</li>
+<li>Keep the previous shared file in Backups before promoting the new file. Ask everyone to import the new shared copy before editing. Browser storage stays on this device and never syncs with Dropbox.</li>
+<li>To recover, export your current working copy first, then import a dated backup. Preview a recipe’s Revision History to recover only its typed values.</li>
+</ol>
+</details>
+</main>
+<div id="print-content"></div>
+</body>
+</html>
