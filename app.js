@@ -148,7 +148,11 @@ function typedContent(recipe) {
 function scans(recipe) {
   const sources = new Map((state.book.sources || []).map(source => [source.id, source]));
   const pages = (recipe.sourceIds || []).map(id => sources.get(id));
-  if (recipe.scanData) pages.unshift({ name: "Original scan", data: recipe.scanData });
+  if (recipe.scanData) {
+    const subtype = /^data:image\/([\w.+-]+)/i.exec(recipe.scanData)?.[1].toLowerCase();
+    const extension = { jpeg: "jpg", "svg+xml": "svg", "vnd.microsoft.icon": "ico" }[subtype] || subtype || "img";
+    pages.unshift({ name: "Original scan." + extension, data: recipe.scanData });
+  }
   return pages;
 }
 
@@ -165,6 +169,24 @@ function scanContent(pages) {
     const link = element("a", "Download original");
     link.href = source.data;
     link.download = source.name;
+    link.addEventListener("click", () => {
+      // Safari handles downloads from object URLs more consistently than data URLs.
+      if (!Cookbook.image(source.data)) return;
+      const match = /^data:(image\/[\w.+-]+);base64,([\s\S]+)$/i.exec(source.data);
+      if (!match) return;
+      const [, type, payload] = match;
+      try {
+        const bytes = Uint8Array.from(atob(payload), character => character.charCodeAt(0));
+        const url = URL.createObjectURL(new Blob([bytes], { type }));
+        link.href = url;
+        setTimeout(() => {
+          if (link.href === url) link.href = source.data;
+          URL.revokeObjectURL(url);
+        }, 60000);
+      } catch {
+        // Leave the original download link available if decoding fails.
+      }
+    });
     figure.append(img, caption, link);
     section.append(figure);
   });
@@ -191,7 +213,12 @@ function showRecipe(id, focus = true) {
     if (existing) existing.remove();
     else detail.append(scanContent(pages));
     event.currentTarget.setAttribute("aria-expanded", String(!existing));
-    if (!existing) detail.lastChild.scrollIntoView({ block: "nearest" });
+    if (!existing) {
+      const heading = detail.lastChild.firstElementChild;
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+      heading.scrollIntoView({ block: "start" });
+    }
   }));
   if (pages.length) actions.firstChild.setAttribute("aria-expanded", "false");
   actions.append(button("Edit Recipe", () => { if (!busy) editRecipe(recipe); }, true),
